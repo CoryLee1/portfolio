@@ -1,155 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Skill Graph Visualization</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
-      body {
-        margin: 0;
-        background: transparent;
-        font-family: sans-serif;
-        color: white;
-      }
-      .node circle {
-        stroke: #fff;
-        stroke-width: 1.5px;
-      }
-      .node text {
-        font-size: 20px;
-        fill: rgb(212, 212, 212);
-        pointer-events: none;
-      }
-      .link {
-        stroke: #999;
-        stroke-opacity: 0.6;
-      }
-    </style>
-  </head>
-  <body>
-    <svg width="1920" height="800"></svg>
 
-    <script>
-      const svg = d3.select("svg"),
-        width = +svg.attr("width"),
-        height = +svg.attr("height");
+<head>
+  <meta charset="utf-8" />
+  <title>Skill Graph Visualization</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: sans-serif;
+      color: white;
+    }
 
-      const graph = {
-        nodes: [
-          { id: "Poespin", group: 1 },
-          { id: "IRL⇒URL", group: 1 },
-          { id: "Echuu AI Vtubing", group: 1 },
-          { id: "Python", group: 2 },
-          { id: "spaCy", group: 2 },
-          { id: "TensorFlow", group: 2 },
-          { id: "scikit-learn", group: 2 },
-          { id: "Jupyter Notebook", group: 2 },
-          { id: "TouchDesigner", group: 3 },
-          { id: "Blender", group: 3 },
-          { id: "C4D", group: 3 },
-          { id: "Next.js", group: 4 },
-          { id: "Node.js", group: 4 },
-          { id: "WebRTC", group: 4 },
-          { id: "Three.js", group: 4 },
-          { id: "Socket.io", group: 4 },
-          { id: "Google Gemini", group: 5 },
-          { id: "Adobe Suite", group: 6 },
-          { id: "Figma", group: 6 },
-          { id: "Unity WebGL", group: 6 },
-        ],
-        links: [
-          { source: "Poespin", target: "Python" },
-          { source: "Poespin", target: "spaCy" },
-          { source: "Poespin", target: "TensorFlow" },
-          { source: "Poespin", target: "scikit-learn" },
-          { source: "Poespin", target: "Jupyter Notebook" },
-          { source: "Poespin", target: "TouchDesigner" },
-          { source: "Poespin", target: "Blender" },
-          { source: "Poespin", target: "C4D" },
-          { source: "IRL⇒URL", target: "Next.js" },
-          { source: "IRL⇒URL", target: "Node.js" },
-          { source: "IRL⇒URL", target: "WebRTC" },
-          { source: "IRL⇒URL", target: "Three.js" },
-          { source: "IRL⇒URL", target: "Socket.io" },
-          { source: "IRL⇒URL", target: "Google Gemini" },
-          { source: "IRL⇒URL", target: "Adobe Suite" },
-          { source: "IRL⇒URL", target: "Figma" },
-          { source: "Echuu AI Vtubing", target: "Next.js" },
-          { source: "Echuu AI Vtubing", target: "Google Gemini" },
-          { source: "Echuu AI Vtubing", target: "Unity WebGL" },
-          { source: "Echuu AI Vtubing", target: "Blender" },
-          { source: "Echuu AI Vtubing", target: "Adobe Suite" },
-        ],
-      };
+    .node circle {
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
 
-      const color = d3.scaleOrdinal(d3.schemeCategory10);
+    .node text {
+      font-size: 14px;
+      font-weight: bold;
+      stroke: #000;
+      stroke-width: 0.5px;
+      paint-order: stroke fill;
+    }
 
-      const simulation = d3
-        .forceSimulation(graph.nodes)
-        .force(
-          "link",
-          d3.forceLink(graph.links).id(d => d.id).distance(100)
-        )
-        .force("charge", d3.forceManyBody().strength(-200))
-        .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("x", d3.forceX(width / 2).strength(0.05)) // 轻微x拉力
-        .force("y", d3.forceY(height / 2).strength(0.05)); // 轻微y拉力
+    .link {
+      stroke: #999;
+      stroke-opacity: 0.6;
+    }
+  </style>
+</head>
 
-      const link = svg
-        .append("g")
-        .selectAll("line")
-        .data(graph.links)
-        .join("line")
-        .attr("class", "link");
+<body>
+  <svg width="1920" height="800"></svg>
 
-      const node = svg
-        .append("g")
-        .selectAll("g")
-        .data(graph.nodes)
-        .join("g")
-        .call(
-          d3
-            .drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended)
-        );
+  <script>
+    const svg = d3.select("svg"),
+      width = +svg.attr("width"),
+      height = +svg.attr("height");
 
-      node.append("circle")
-        .attr("r", 16)
-        .attr("fill", (d) => color(d.group));
+    const graph = {
+      nodes: [
+        { id: "Poespin", group: 1 },
+        { id: "IRL⇒URL", group: 1 },
+        { id: "Echuu AI Vtubing", group: 1 },
+        { id: "Python", group: 2 },
+        { id: "spaCy", group: 2 },
+        { id: "TensorFlow", group: 2 },
+        { id: "scikit-learn", group: 2 },
+        { id: "Jupyter Notebook", group: 2 },
+        { id: "TouchDesigner", group: 3 },
+        { id: "Blender", group: 3 },
+        { id: "C4D", group: 3 },
+        { id: "Next.js", group: 4 },
+        { id: "Node.js", group: 4 },
+        { id: "WebRTC", group: 4 },
+        { id: "Three.js", group: 4 },
+        { id: "Socket.io", group: 4 },
+        { id: "Google Gemini", group: 5 },
+        { id: "Adobe Suite", group: 6 },
+        { id: "Figma", group: 6 },
+        { id: "Unity WebGL", group: 6 },
+      ],
+      links: [
+        { source: "Poespin", target: "Python" },
+        { source: "Poespin", target: "spaCy" },
+        { source: "Poespin", target: "TensorFlow" },
+        { source: "Poespin", target: "scikit-learn" },
+        { source: "Poespin", target: "Jupyter Notebook" },
+        { source: "Poespin", target: "TouchDesigner" },
+        { source: "Poespin", target: "Blender" },
+        { source: "Poespin", target: "C4D" },
+        { source: "IRL⇒URL", target: "Next.js" },
+        { source: "IRL⇒URL", target: "Node.js" },
+        { source: "IRL⇒URL", target: "WebRTC" },
+        { source: "IRL⇒URL", target: "Three.js" },
+        { source: "IRL⇒URL", target: "Socket.io" },
+        { source: "IRL⇒URL", target: "Google Gemini" },
+        { source: "IRL⇒URL", target: "Adobe Suite" },
+        { source: "IRL⇒URL", target: "Figma" },
+        { source: "Echuu AI Vtubing", target: "Next.js" },
+        { source: "Echuu AI Vtubing", target: "Google Gemini" },
+        { source: "Echuu AI Vtubing", target: "Unity WebGL" },
+        { source: "Echuu AI Vtubing", target: "Blender" },
+        { source: "Echuu AI Vtubing", target: "Adobe Suite" },
+      ],
+    };
 
-      node.append("text")
-        .attr("x", 12)
-        .attr("y", 4)
-        .text((d) => d.id);
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-      simulation.on("tick", () => {
-        link
-          .attr("x1", (d) => d.source.x)
-          .attr("y1", (d) => d.source.y)
-          .attr("x2", (d) => d.target.x)
-          .attr("y2", (d) => d.target.y);
+    const simulation = d3
+      .forceSimulation(graph.nodes)
+      .force(
+        "link",
+        d3.forceLink(graph.links).id(d => d.id).distance(100)
+      )
+      .force("charge", d3.forceManyBody().strength(-200))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("x", d3.forceX(width / 2).strength(0.05)) // 轻微x拉力
+      .force("y", d3.forceY(height / 2).strength(0.05)); // 轻微y拉力
 
-        node.attr("transform", (d) => `translate(${d.x},${d.y})`);
-      });
+    const link = svg
+      .append("g")
+      .selectAll("line")
+      .data(graph.links)
+      .join("line")
+      .attr("class", "link");
 
-      function dragstarted(event, d) {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x;
-        d.fy = d.y;
-      }
+    const node = svg
+      .append("g")
+      .selectAll("g")
+      .data(graph.nodes)
+      .join("g")
+      .call(
+        d3
+          .drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended)
+      );
 
-      function dragged(event, d) {
-        d.fx = event.x;
-        d.fy = event.y;
-      }
+    node.append("circle")
+      .attr("r", 16)
+      .attr("fill", (d) => color(d.group));
 
-      function dragended(event, d) {
-        if (!event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
-      }
-    </script>
-  </body>
+    node.append("text")
+      .attr("x", 14)
+      .attr("y", 4)
+      .text((d) => d.id)
+      .attr("fill", (d) => getTextColor(color(d.group)))
+      .attr("stroke", "black")
+      .attr("stroke-width", 0.5)
+      .attr("paint-order", "stroke fill");
+
+    simulation.on("tick", () => {
+      link
+        .attr("x1", (d) => d.source.x)
+        .attr("y1", (d) => d.source.y)
+        .attr("x2", (d) => d.target.x)
+        .attr("y2", (d) => d.target.y);
+
+      node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+    });
+
+    function dragstarted(event, d) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    }
+
+    function dragged(event, d) {
+      d.fx = event.x;
+      d.fy = event.y;
+    }
+
+    function dragended(event, d) {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    }
+  </script>
+</body>
+
 </html>
