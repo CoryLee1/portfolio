@@ -14,7 +14,7 @@
 
       #graph-container {
         width: 100%;
-        height: 100%;
+        min-height: 600px; /* 保底高度，避免掉下去 */
         position: relative;
       }
 
@@ -41,11 +41,9 @@
     </div>
 
     <script>
-      // 1. 获取容器
       const container = document.getElementById("graph-container");
       const svg = d3.select("svg");
 
-      // 2. 数据结构
       const graph = {
         nodes: [
           { id: "Poespin", group: 1 },
@@ -94,7 +92,6 @@
         ],
       };
 
-      // 3. 层级透明度映射
       function getOpacity(group) {
         switch (group) {
           case 1: return 1;
@@ -108,16 +105,14 @@
       }
 
       const simulation = d3.forceSimulation(graph.nodes)
-      .force("link", d3.forceLink(graph.links).id(d => d.id).distance(100).strength(0.9))
-      .force("charge", d3.forceManyBody().strength(-150)) // 斥力温和一点
-      .force("center", d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2))
-      .force("y", d3.forceY(container.clientHeight / 2).strength(0.1)) // 稍微强一点
-      .force("x", d3.forceX(container.clientWidth / 2).strength(0.1))
-      .alphaDecay(0.2)
-      .alpha(1)
-      .restart();
-    
-    
+        .force("link", d3.forceLink(graph.links).id(d => d.id).distance(100).strength(0.9))
+        .force("charge", d3.forceManyBody().strength(-150))
+        .force("center", d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2))
+        .force("y", d3.forceY(container.clientHeight / 2).strength(0.1))
+        .force("x", d3.forceX(container.clientWidth / 2).strength(0.1))
+        .alphaDecay(0.02) /* 防止冷却太快 */
+        .alpha(1)
+        .restart();
 
       const link = svg.append("g")
         .selectAll("line")
@@ -170,13 +165,14 @@
         d.fy = null;
       }
 
-      // 5. 自适应容器变化
       const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
           const width = entry.contentRect.width;
           const height = entry.contentRect.height;
           svg.attr("width", width).attr("height", height);
           simulation.force("center", d3.forceCenter(width / 2, height / 2));
+          simulation.force("x", d3.forceX(width / 2).strength(0.1));
+          simulation.force("y", d3.forceY(height / 2).strength(0.1));
           simulation.alpha(1).restart();
         }
       });
