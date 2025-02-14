@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Skill Graph Visualization</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      .node circle {
+        stroke: #fff;
+        stroke-width: 1.5px;
+      }
+      .node text {
+        font-size: 12px;
+        pointer-events: none;
+      }
+      .link {
+        stroke: #999;
+        stroke-opacity: 0.6;
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="800" height="600"></svg>
+
+    <script>
+      const svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height");
+
+      const graph = {
+        nodes: [
+          { id: "Full Stack", group: 1 },
+          { id: "C4D", group: 2 },
+          { id: "Blender", group: 2 },
+          { id: "Adobe Suite", group: 3 },
+          { id: "Figma", group: 3 },
+          { id: "Python", group: 4 },
+        ],
+        links: [
+          { source: "Full Stack", target: "Python" },
+          { source: "Full Stack", target: "C4D" },
+          { source: "C4D", target: "Blender" },
+          { source: "Adobe Suite", target: "Figma" },
+        ],
+      };
+
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+      const simulation = d3
+        .forceSimulation(graph.nodes)
+        .force(
+          "link",
+          d3
+            .forceLink(graph.links)
+            .id((d) => d.id)
+            .distance(100)
+        )
+        .force("charge", d3.forceManyBody().strength(-200))
+        .force("center", d3.forceCenter(width / 2, height / 2));
+
+      const link = svg
+        .append("g")
+        .selectAll("line")
+        .data(graph.links)
+        .join("line")
+        .attr("class", "link");
+
+      const node = svg
+        .append("g")
+        .selectAll("g")
+        .data(graph.nodes)
+        .join("g")
+        .call(
+          d3
+            .drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        );
+
+      node.append("circle")
+        .attr("r", 8)
+        .attr("fill", (d) => color(d.group));
+
+      node.append("text")
+        .attr("x", 12)
+        .attr("y", 4)
+        .text((d) => d.id);
+
+      simulation.on("tick", () => {
+        link
+          .attr("x1", (d) => d.source.x)
+          .attr("y1", (d) => d.source.y)
+          .attr("x2", (d) => d.target.x)
+          .attr("y2", (d) => d.target.y);
+
+        node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+      });
+
+      function dragstarted(event, d) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      function dragged(event, d) {
+        d.fx = event.x;
+        d.fy = event.y;
+      }
+
+      function dragended(event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+    </script>
+  </body>
+</html>
