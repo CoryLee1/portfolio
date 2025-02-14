@@ -13,7 +13,8 @@
         stroke-width: 1.5px;
       }
       .node text {
-        font-size: 12px;
+        font-size: 18px;
+        fill: rgb(212, 212, 212);
         pointer-events: none;
       }
       .link {
@@ -82,7 +83,7 @@
         );
 
       node.append("circle")
-        .attr("r", 8)
+        .attr("r", 12)
         .attr("fill", (d) => color(d.group));
 
       node.append("text")
