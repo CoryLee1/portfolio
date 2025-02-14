@@ -24,7 +24,7 @@
     </style>
   </head>
   <body>
-    <svg width="800" height="600"></svg>
+    <svg width="1500" height="600"></svg>
 
     <script>
       const svg = d3.select("svg"),
@@ -113,7 +113,7 @@
         );
 
       node.append("circle")
-        .attr("r", 12)
+        .attr("r", 16)
         .attr("fill", (d) => color(d.group));
 
       node.append("text")
