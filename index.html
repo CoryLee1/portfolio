@@ -109,9 +109,12 @@
 
       // 4. 初始化 D3 力导向图
       const simulation = d3.forceSimulation(graph.nodes)
-        .force("link", d3.forceLink(graph.links).id(d => d.id).distance(100))
-        .force("charge", d3.forceManyBody().strength(-300))
-        .force("center", d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2));
+      .force("link", d3.forceLink(graph.links).id(d => d.id).distance(80).strength(0.9))
+      .force("charge", d3.forceManyBody().strength(-200)) // 斥力减弱一点
+      .force("center", d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2))
+      .force("y", d3.forceY(container.clientHeight / 2).strength(0.05)) // 防止下坠
+      .force("x", d3.forceX(container.clientWidth / 2).strength(0.05));
+    
 
       const link = svg.append("g")
         .selectAll("line")
