@@ -13,13 +13,13 @@
       }
 
       #graph-container {
-        width: 800px;
-        height: 600px;
+        width: 1920px;
+        height: 1080px;
         position: relative;
       }
 
       .node text {
-        font-size: 12px;
+        font-size: 18px;
         fill: white;
         pointer-events: none;
       }
@@ -133,7 +133,7 @@
           .on("end", dragended));
 
       node.append("circle")
-        .attr("r", 12)
+        .attr("r", 24)
         .attr("fill", "white")
         .attr("fill-opacity", d => getOpacity(d.group));
 
