@@ -6,46 +6,30 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
       body {
-        margin: 0;
-        background: transparent;
         font-family: sans-serif;
-        color: white;
       }
-
-      #graph-container {
-        width: 1920px;
-        height: 1080px;
-        position: relative;
-      }
-
-      .node text {
-        font-size: 18px;
-        fill: white;
-        pointer-events: none;
-      }
-
-      .link {
-        stroke: rgba(255, 255, 255, 0.3);
+      .node circle {
+        stroke: #fff;
         stroke-width: 1.5px;
       }
-
-      .legend-text {
-        font-size: 12px;
-        fill: white;
+      .node text {
+        font-size: 20px;
+        fill: rgb(212, 212, 212);
+        pointer-events: none;
+      }
+      .link {
+        stroke: #999;
+        stroke-opacity: 0.6;
       }
     </style>
   </head>
   <body>
-    <div id="graph-container">
-      <svg width="1920" height="1080"></svg>
-    </div>
+    <svg width="800" height="600"></svg>
 
     <script>
-      const container = document.getElementById("graph-container");
-      const svg = d3.select("svg");
-
-      const width = 1920;
-      const height = 1080;
+      const svg = d3.select("svg"),
+        width = +svg.attr("width"),
+        height = +svg.attr("height");
 
       const graph = {
         nodes: [
@@ -95,60 +79,56 @@
         ],
       };
 
-      function getOpacity(group) {
-        switch (group) {
-          case 1: return 1;
-          case 2: return 0.8;
-          case 3:
-          case 4: return 0.5;
-          case 5:
-          case 6: return 0.3;
-          default: return 0.5;
-        }
-      }
+      const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-      const simulation = d3.forceSimulation(graph.nodes)
-        .force("link", d3.forceLink(graph.links).id(d => d.id).distance(100).strength(0.9))
-        .force("charge", d3.forceManyBody().strength(-150))
+      const simulation = d3
+        .forceSimulation(graph.nodes)
+        .force(
+          "link",
+          d3.forceLink(graph.links).id(d => d.id).distance(100)
+        )
+        .force("charge", d3.forceManyBody().strength(-200))
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("y", d3.forceY(height / 2).strength(0.1))
-        .force("x", d3.forceX(width / 2).strength(0.1))
-        .alphaDecay(0.02)
-        .alpha(1)
-        .restart();
+        .force("x", d3.forceX(width / 2).strength(0.05)) // 轻微x拉力
+        .force("y", d3.forceY(height / 2).strength(0.05)); // 轻微y拉力
 
-      const link = svg.append("g")
+      const link = svg
+        .append("g")
         .selectAll("line")
         .data(graph.links)
         .join("line")
         .attr("class", "link");
 
-      const node = svg.append("g")
+      const node = svg
+        .append("g")
         .selectAll("g")
         .data(graph.nodes)
         .join("g")
-        .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
+        .call(
+          d3
+            .drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended)
+        );
 
       node.append("circle")
-        .attr("r", 24)
-        .attr("fill", "white")
-        .attr("fill-opacity", d => getOpacity(d.group));
+        .attr("r", 12)
+        .attr("fill", (d) => color(d.group));
 
       node.append("text")
-        .attr("x", 14)
+        .attr("x", 12)
         .attr("y", 4)
-        .text(d => d.id);
+        .text((d) => d.id);
 
       simulation.on("tick", () => {
-        link.attr("x1", d => d.source.x)
-          .attr("y1", d => d.source.y)
-          .attr("x2", d => d.target.x)
-          .attr("y2", d => d.target.y);
+        link
+          .attr("x1", (d) => d.source.x)
+          .attr("y1", (d) => d.source.y)
+          .attr("x2", (d) => d.target.x)
+          .attr("y2", (d) => d.target.y);
 
-        node.attr("transform", d => `translate(${d.x},${d.y})`);
+        node.attr("transform", (d) => `translate(${d.x},${d.y})`);
       });
 
       function dragstarted(event, d) {
