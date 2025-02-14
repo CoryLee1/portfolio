@@ -19,9 +19,9 @@
     }
 
     .node text {
-      font-size: 14px;
+      font-size: 18px;
       font-weight: bold;
-      stroke: #000;
+      stroke: #ffffff;
       stroke-width: 0.5px;
       paint-order: stroke fill;
     }
@@ -123,7 +123,7 @@
       );
 
     node.append("circle")
-      .attr("r", 16)
+      .attr("r", 24)
       .attr("fill", (d) => color(d.group));
 
     node.append("text")
@@ -150,7 +150,7 @@
       d.fx = d.x;
       d.fy = d.y;
     }
-    
+
     function getTextColor(bgColor) {
       const rgb = d3.color(bgColor).rgb();
       const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
@@ -170,5 +170,4 @@
     }
   </script>
 </body>
-
 </html>
