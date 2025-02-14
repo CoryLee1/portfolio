@@ -13,8 +13,8 @@
       }
 
       #graph-container {
-        width: 1920px;
-        min-height: 1080px; /* 保底高度，避免掉下去 */
+        width: 800px;
+        height: 600px;
         position: relative;
       }
 
@@ -37,12 +37,15 @@
   </head>
   <body>
     <div id="graph-container">
-      <svg></svg>
+      <svg width="1920" height="1080"></svg>
     </div>
 
     <script>
       const container = document.getElementById("graph-container");
       const svg = d3.select("svg");
+
+      const width = 1920;
+      const height = 1080;
 
       const graph = {
         nodes: [
@@ -107,10 +110,10 @@
       const simulation = d3.forceSimulation(graph.nodes)
         .force("link", d3.forceLink(graph.links).id(d => d.id).distance(100).strength(0.9))
         .force("charge", d3.forceManyBody().strength(-150))
-        .force("center", d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2))
-        .force("y", d3.forceY(container.clientHeight / 2).strength(0.1))
-        .force("x", d3.forceX(container.clientWidth / 2).strength(0.1))
-        .alphaDecay(0.02) /* 防止冷却太快 */
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("y", d3.forceY(height / 2).strength(0.1))
+        .force("x", d3.forceX(width / 2).strength(0.1))
+        .alphaDecay(0.02)
         .alpha(1)
         .restart();
 
@@ -164,20 +167,6 @@
         d.fx = null;
         d.fy = null;
       }
-
-      const resizeObserver = new ResizeObserver(entries => {
-        for (let entry of entries) {
-          const width = entry.contentRect.width;
-          const height = entry.contentRect.height;
-          svg.attr("width", width).attr("height", height);
-          simulation.force("center", d3.forceCenter(width / 2, height / 2));
-          simulation.force("x", d3.forceX(width / 2).strength(0.1));
-          simulation.force("y", d3.forceY(height / 2).strength(0.1));
-          simulation.alpha(1).restart();
-        }
-      });
-
-      resizeObserver.observe(container);
     </script>
   </body>
 </html>
