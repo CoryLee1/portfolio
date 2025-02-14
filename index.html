@@ -14,21 +14,20 @@
     }
 
     .node circle {
-      stroke: #fff;
+      stroke: #ffffff;
       stroke-width: 1.5px;
     }
 
     .node text {
       font-size: 18px;
       font-weight: bold;
-      stroke: #ffffff;
-      stroke-width: 0.5px;
-      paint-order: stroke fill;
+      fill: #eaeaea;
+      pointer-events: none;
     }
 
     .link {
-      stroke: #999;
-      stroke-opacity: 0.6;
+      stroke: rgba(255, 255, 255, 0.3);
+      stroke-width: 1.5px;
     }
   </style>
 </head>
@@ -89,18 +88,52 @@
       ],
     };
 
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
+    // 节点大小按层级映射
+    function getRadius(group) {
+      switch (group) {
+        case 1:
+          return 24; // 核心项目最大
+        case 2:
+          return 20;
+        case 3:
+        case 4:
+          return 16;
+        case 5:
+        case 6:
+          return 12;
+        default:
+          return 14;
+      }
+    }
+
+    // 节点透明度按层级映射
+    function getOpacity(group) {
+      switch (group) {
+        case 1:
+          return 1;
+        case 2:
+          return 0.8;
+        case 3:
+        case 4:
+          return 0.5;
+        case 5:
+        case 6:
+          return 0.3;
+        default:
+          return 0.5;
+      }
+    }
 
     const simulation = d3
       .forceSimulation(graph.nodes)
       .force(
         "link",
-        d3.forceLink(graph.links).id(d => d.id).distance(100)
+        d3.forceLink(graph.links).id(d => d.id).distance(120)
       )
       .force("charge", d3.forceManyBody().strength(-200))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("x", d3.forceX(width / 2).strength(0.05)) // 轻微x拉力
-      .force("y", d3.forceY(height / 2).strength(0.05)); // 轻微y拉力
+      .force("x", d3.forceX(width / 2).strength(0.05))
+      .force("y", d3.forceY(height / 2).strength(0.05));
 
     const link = svg
       .append("g")
@@ -114,6 +147,7 @@
       .selectAll("g")
       .data(graph.nodes)
       .join("g")
+      .attr("class", "node")
       .call(
         d3
           .drag()
@@ -123,17 +157,14 @@
       );
 
     node.append("circle")
-      .attr("r", 24)
-      .attr("fill", (d) => color(d.group));
+      .attr("r", (d) => getRadius(d.group))
+      .attr("fill", "white")
+      .attr("fill-opacity", (d) => getOpacity(d.group));
 
     node.append("text")
       .attr("x", 14)
       .attr("y", 4)
-      .text((d) => d.id)
-      .attr("fill", (d) => getTextColor(color(d.group)))
-      .attr("stroke", "black")
-      .attr("stroke-width", 0.5)
-      .attr("paint-order", "stroke fill");
+      .text((d) => d.id);
 
     simulation.on("tick", () => {
       link
@@ -151,13 +182,6 @@
       d.fy = d.y;
     }
 
-    function getTextColor(bgColor) {
-      const rgb = d3.color(bgColor).rgb();
-      const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-      return brightness > 125 ? "#000" : "#fff";
-    }
-    
-
     function dragged(event, d) {
       d.fx = event.x;
       d.fy = event.y;
@@ -170,4 +194,5 @@
     }
   </script>
 </body>
+
 </html>
